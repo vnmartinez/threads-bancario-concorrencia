@@ -4,16 +4,16 @@ from threading import Lock
 import json
 import logging
 
-# Configuração de logging
+
 logging.basicConfig(filename='banco.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 app = FastAPI()
 
-# Estrutura de dados para as contas
+
 contas = {}
 lock = Lock()
 
-# Modelo para transações
+
 class Transacao(BaseModel):
     tipo: str
     conta: str
@@ -31,12 +31,12 @@ def salvar_dados():
     with open('contas.json', 'w') as file:
         json.dump(contas, file)
 
-# Inicializa os dados
+
 contas = carregar_dados()
 
 @app.post("/transacao/")
 async def processar_transacao(transacao: Transacao):
-    with lock:  # Protege o acesso às contas
+    with lock: 
         if transacao.tipo == 'deposito':
             contas[transacao.conta] = contas.get(transacao.conta, 0) + transacao.valor
             logging.info(f'Depósito: {transacao.valor} na conta {transacao.conta}')

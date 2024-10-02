@@ -20,7 +20,7 @@ class BancoCliente:
         elif operacao in ['deposito', 'saque']:
             valor = random.randint(10, 100)
             return {'tipo': operacao, 'conta': conta, 'valor': valor}
-        else:  # consulta
+        else: 
             return {'tipo': operacao, 'conta': conta}
 
     def enviar_transacao(self, transacao):
@@ -39,10 +39,10 @@ class BancoCliente:
                 t = threading.Thread(target=self.enviar_transacao, args=(transacao,))
                 threads.append(t)
                 t.start()
-                time.sleep(random.uniform(0.1, 0.5))  # Atraso entre transações
+                time.sleep(random.uniform(0.1, 0.5))   
         for t in threads:
             t.join()
 
 if __name__ == "__main__":
-    cliente = BancoCliente(num_transacoes=5)  # Pode ajustar o número de transações
-    cliente.executar_clientes(num_clientes=10)  # Simula 10 clientes
+    cliente = BancoCliente(num_transacoes=5) 
+    cliente.executar_clientes(num_clientes=10) 

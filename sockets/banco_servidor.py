@@ -6,17 +6,16 @@ import logging
 from collections import defaultdict
 from threading import Lock, Semaphore
 
-# Configuração de logging
+
 logging.basicConfig(filename='banco.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 class BancoServidor:
     def __init__(self, host='localhost', port=12345):
-        self.contas = defaultdict(float)  # Dicionário para armazenar saldos
-        self.lock = Lock()  # Lock para proteger acessos concorrentes
-        self.semaphore = Semaphore(5)  # Limita a 5 operações simultâneas
-        self.carregar_dados()  # Carrega dados de contas existentes
+        self.contas = defaultdict(float)  
+        self.lock = Lock()  
+        self.semaphore = Semaphore(5)  
+        self.carregar_dados()  
 
-        # Inicia o servidor
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((host, port))
         self.server_socket.listen(5)
@@ -54,8 +53,8 @@ class BancoServidor:
         conta = operacao['conta']
         valor = operacao.get('valor', 0)
 
-        with self.semaphore:  # Limita o número de operações simultâneas
-            with self.lock:  # Protege o acesso às contas
+        with self.semaphore:  
+            with self.lock:  
                 if tipo == 'deposito':
                     self.contas[conta] += valor
                     logging.info(f'Depósito: {valor} na conta {conta}')
@@ -78,7 +77,7 @@ class BancoServidor:
                     else:
                         return f'Saldo insuficiente na conta {conta}.'
 
-                self.salvar_dados()  # Salva dados após cada operação
+                self.salvar_dados()   
                 return f'Operação {tipo} realizada com sucesso na conta {conta}.'
 
     def run(self):
