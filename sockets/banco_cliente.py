@@ -14,10 +14,10 @@ class BancoCliente:
         operacao = random.choice(self.operacoes)
         if operacao == 'transferencia':
             conta_destino = f"conta{random.randint(1, 5)}"
-            valor = random.randint(10, 10000)
+            valor = random.randint(10, 100)
             return {'tipo': operacao, 'conta': conta, 'conta_destino': conta_destino, 'valor': valor}
         elif operacao in ['deposito', 'saque']:
-            valor = random.randint(10, 10000)
+            valor = random.randint(10, 100)
             return {'tipo': operacao, 'conta': conta, 'valor': valor}
         else: 
             return {'tipo': operacao, 'conta': conta}
