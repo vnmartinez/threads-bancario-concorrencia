@@ -49,13 +49,15 @@ class BancoServidor:
             operacao_tipo = operacao.get('tipo')
             conta = operacao.get('conta')
             valor = operacao.get('valor', 0)
+
             print (f'Executando operação {operacao_tipo} na conta {conta}...')
             if operacao_tipo == 'deposito':
                 with self.lock:  
                     self.contas[conta] += valor
                     self.salvar_dados()
                     return f"Depósito de {valor} realizado com sucesso na conta {conta}."
-            elif operacao_tipo == 'saque':
+                
+            if operacao_tipo == 'saque':
                 with self.lock: 
                     if self.contas[conta] >= valor:
                         self.contas[conta] -= valor
@@ -63,43 +65,21 @@ class BancoServidor:
                         return f"Saque de {valor} realizado com sucesso na conta {conta}."
                     else:
                         return "Saldo insuficiente."
-            else:
-                return "Operação inválida."
-
-    def executar_operacao_geral(self, operacao):
-        tipo = operacao['tipo']
-        conta = operacao['conta']
-        valor = operacao.get('valor', 0)
-        print(f"Executando operação {tipo} na conta {conta}...")
-        with self.semaphore: 
-            with self.lock: 
-                print(f"Executando operação {tipo} na conta {conta}...")
-
-                if tipo == 'deposito':
-                    self.contas[conta] += valor
-                    logging.info(f'Depósito: {valor} na conta {conta}')
-                elif tipo == 'saque':
-                    if self.contas[conta] >= valor:
-                        self.contas[conta] -= valor
-                        logging.info(f'Saque: {valor} da conta {conta}')
-                    else:
-                        return f'Saldo insuficiente na conta {conta}.'
-                elif tipo == 'consulta':
+            if operacao_tipo == 'consulta':
+                with self.lock: 
                     saldo = self.contas[conta]
-                    logging.info(f'Consulta saldo: {saldo} na conta {conta}')
-                    return f'Saldo na conta {conta}: {saldo}'
-                elif tipo == 'transferencia':
-                    conta_destino = operacao['conta_destino']
+                    return f"Saldo na conta {conta}: {saldo}."
+            
+            if operacao_tipo == 'transferencia':
+                conta_destino = operacao.get('conta_destino')
+                with self.lock: 
                     if self.contas[conta] >= valor:
                         self.contas[conta] -= valor
                         self.contas[conta_destino] += valor
-                        logging.info(f'Transferência: {valor} da conta {conta} para {conta_destino}')
+                        self.salvar_dados()
+                        return f"Transferência de {valor} realizada com sucesso da conta {conta} para a conta {conta_destino}."
                     else:
-                        return f'Saldo insuficiente na conta {conta}.'
-
-                self.salvar_dados()
-
-                return f'Operação {tipo} realizada com sucesso na conta {conta}.'
+                        return "Saldo insuficiente."
 
     def run(self):
         with ThreadPoolExecutor(max_workers=5) as executor:  
