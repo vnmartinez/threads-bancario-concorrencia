@@ -1,7 +1,6 @@
 import socket
 import json
 import random
-import time
 from concurrent.futures import ThreadPoolExecutor
 
 class BancoCliente:
@@ -31,13 +30,12 @@ class BancoCliente:
             print(f'Resposta do servidor: {resposta}')
 
     def executar_clientes(self, num_clientes):
-        with ThreadPoolExecutor(max_workers=num_clientes) as executor:
+        with ThreadPoolExecutor(num_clientes) as executor:
             for i in range(num_clientes):
                 conta = f"conta{i % 5 + 1}"
                 for _ in range(self.num_transacoes):
                     transacao = self.gerar_transacao(conta)
                     executor.submit(self.enviar_transacao, transacao)
-                    time.sleep(random.uniform(0.1, 0.5))  # Adiciona um pequeno atraso entre transações
 
 if __name__ == "__main__":
     cliente = BancoCliente(num_transacoes=5)
