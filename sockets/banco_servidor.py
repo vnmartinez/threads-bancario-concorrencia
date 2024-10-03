@@ -25,14 +25,12 @@ class BancoServidor:
         try:
             with open('contas.json', 'r') as file:
                 self.contas = json.load(file)
-                print("Dados carregados com sucesso.")
         except FileNotFoundError:
             print("Arquivo de dados não encontrado. Usando contas vazias.")
     
     def salvar_dados(self):
         with open('contas.json', 'w') as file:
             json.dump(self.contas, file)
-            print("Dados salvos com sucesso.")
 
     def processar_operacoes(self, conn):
         while True:
@@ -55,6 +53,7 @@ class BancoServidor:
 
         with self.semaphore:  
             with self.lock:  
+                print(f"Executando operação {tipo} na conta {conta}...")
                 if tipo == 'deposito':
                     self.contas[conta] += valor
                     logging.info(f'Depósito: {valor} na conta {conta}')
@@ -83,7 +82,6 @@ class BancoServidor:
     def run(self):
         while True:
             conn, addr = self.server_socket.accept()
-            print(f'Conexão aceita de {addr}.')
             threading.Thread(target=self.processar_operacoes, args=(conn,)).start()
 
 if __name__ == "__main__":
